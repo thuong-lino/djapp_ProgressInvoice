@@ -236,7 +236,6 @@ $(document).ready(function () {
                 title: "Error!",
                 text: "Error",
                 icon: "error",
-                button: "OK",
               });
             },
           });
