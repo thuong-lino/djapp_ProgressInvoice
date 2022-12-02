@@ -89,7 +89,7 @@ DATABASES = {
         "NAME": config['db_app'],
         "USER": config['user'],
         "PASSWORD": config['password'],
-        "PORT": 1433,
+        "PORT":  config['port'],
         "OPTIONS": {
             "driver": "ODBC Driver 17 for SQL Server",
             'Trusted_Connection': 'yes',
@@ -101,7 +101,7 @@ DATABASES = {
         "NAME": config['db_cch'],
         "USER": config['user'],
         "PASSWORD": config['password'],
-        "PORT": 1433,
+        "PORT":  config['port'],
         "OPTIONS": {
             "driver": "ODBC Driver 17 for SQL Server",
             'Trusted_Connection': 'yes',
