@@ -232,7 +232,7 @@ $(document).ready(function () {
             error: function (e) {
               console.log("reload failed");
               console.log(e);
-              swal({
+              Swal.fire({
                 title: "Error!",
                 text: "Error",
                 icon: "error",
