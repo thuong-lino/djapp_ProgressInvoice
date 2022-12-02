@@ -47,3 +47,6 @@ body {
   tr.row-auto-applied{
     background-color:rgba(0, 255, 0, 0.2) !important;
   }
+  .button-edit{
+    display: none;
+  }

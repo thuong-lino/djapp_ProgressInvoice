@@ -31,7 +31,7 @@ function renderClientLevelTd(group, rows) {
 
   var unallocated_amount_sum = open_amount_sum - allocated_amount_sum;
   return `
-    <td colspan="3">${group} (${rows.count()})</td>
+    <td colspan="3">${group}</td>
     <td>${fd(allocated_amount_sum)}</td>
     <td>${fd(unallocated_amount_sum)}</td>
     `;
@@ -54,7 +54,7 @@ function renderInvoiceLevelTd(group, rows) {
   var unallocated_amount_sum = open_amount_sum - allocated_amount_sum;
 
   return `
-    <td colspan="1">${group} (${rows.count()})</td>
+    <td colspan="1">${group}</td>
     <td>${audit_partner}</td>
     <td>${fd(open_amount_sum)}</td>
     <td>${fd(allocated_amount_sum)}</td>
@@ -188,16 +188,10 @@ $(document).ready(function () {
           r.style.display = collapsed ? "none" : "";
         });
 
-        return (
-          $("<tr/>")
-            .append(td_row)
-            // .append("<td >" + group + " (" + rows.count() + ")</td>")
-            // .append("<td >" + group + " (" + rows.count() + ")</td>")
-            // .append("<td >" + group + " (" + rows.count() + ")</td>")
-            // .append("<td >" + group + " (" + rows.count() + ")</td>")
-            .attr("data-name", all)
-            .toggleClass("collapsed", collapsed)
-        );
+        return $("<tr/>")
+          .append(td_row)
+          .attr("data-name", all)
+          .toggleClass("collapsed", collapsed);
       },
     },
     buttons: [
@@ -205,6 +199,7 @@ $(document).ready(function () {
         extend: "selected", // Bind to Selected row
         text: "Edit",
         name: "edit", // do not change name
+        className: "button-edit",
       },
       {
         text: "Refresh All",
@@ -241,31 +236,6 @@ $(document).ready(function () {
           });
         },
       },
-      // {
-      //   extend: "excel",
-      //   text: '<i class="fas fa-file-excel fa-2x"></i> Excel',
-      //   className: "btn-outline-secondary text-success",
-      //   init: function (api, node, config) {
-      //     $(node).removeClass("btn-secondary");
-      //   },
-      //   action: function (e, dt, node, config) {
-      //     var that = this;
-      //     // isLoading("Descargando excel"); // function to show a loading spin
-
-      //     setTimeout(function () {
-      //       // it will download and hide the loading spin when excel is ready
-      //       exportExtension = "Excel";
-      //       $.fn.DataTable.ext.buttons.excelHtml5.action.call(
-      //         that,
-      //         e,
-      //         dt,
-      //         node,
-      //         config
-      //       );
-      //       // swal.close(); // close spin
-      //     }, 1000);
-      //   },
-      // },
     ],
     onEditRow: function (datatable, rowdata, success, error) {
       console.log(rowdata);
