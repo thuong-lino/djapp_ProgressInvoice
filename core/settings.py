@@ -88,7 +88,7 @@ DATABASES = {
         "HOST": config['server'],
         "NAME": config['db_app'],
         "USER": config['user'],
-        "PASSWORD": config['pawsword'],
+        "PASSWORD": config['password'],
         "PORT": 1433,
         "OPTIONS": {
             "driver": "ODBC Driver 17 for SQL Server",
@@ -100,7 +100,7 @@ DATABASES = {
         "HOST": config['server'],
         "NAME": config['db_cch'],
         "USER": config['user'],
-        "PASSWORD": config['pawsword'],
+        "PASSWORD": config['password'],
         "PORT": 1433,
         "OPTIONS": {
             "driver": "ODBC Driver 17 for SQL Server",
