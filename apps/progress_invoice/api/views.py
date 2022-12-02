@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum, Case, When, F
+from django.views.decorators.csrf import csrf_exempt
 
 from functools import reduce
 
@@ -11,6 +12,7 @@ from ..models import ProgessInvoiceAllocation, ProgressInvoice
 from ..utils import refresh_all
 
 
+@csrf_exempt
 def refresh_db_view(request):
     if request.method == 'POST':
         refresh_all()
