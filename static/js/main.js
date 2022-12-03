@@ -17,10 +17,15 @@ function fd(num) {
   return (Math.round(num * 100) / 100).toFixed(2);
 }
 function renderClientLevelTd(group, rows) {
-  var open_amount_list = rows.data().pluck("unappliedprog_amt").toArray();
-  var open_amount_sum = [...new Set(open_amount_list)].reduce((a, b) => {
-    return a + b * 1.0;
-  }, 0);
+  var open_amount_sum = 0;
+  rows
+    .data()
+    .toArray()
+    .forEach((element) => {
+      if (element["project_ident"] === null) {
+        open_amount_sum += parseFloat(element["unappliedprog_amt"]);
+      }
+    });
 
   var allocated_amount_sum = rows
     .data()
@@ -30,6 +35,7 @@ function renderClientLevelTd(group, rows) {
     }, 0);
 
   var unallocated_amount_sum = open_amount_sum - allocated_amount_sum;
+
   return `
     <td colspan="3">${group}</td>
     <td>${fd(allocated_amount_sum)}</td>
@@ -39,10 +45,15 @@ function renderClientLevelTd(group, rows) {
 
 function renderInvoiceLevelTd(group, rows) {
   var audit_partner = rows.data().pluck("audit_partner")[0];
-  var open_amount_list = rows.data().pluck("unappliedprog_amt").toArray();
-  var open_amount_sum = [...new Set(open_amount_list)].reduce((a, b) => {
-    return a + b * 1.0;
-  }, 0);
+  var open_amount_sum = 0;
+  rows
+    .data()
+    .toArray()
+    .forEach((element) => {
+      if (element["project_ident"] === null) {
+        open_amount_sum += parseFloat(element["unappliedprog_amt"]);
+      }
+    });
 
   var allocated_amount_sum = rows
     .data()
@@ -133,6 +144,7 @@ $(document).ready(function () {
     order: [
       [0, "asc"],
       [1, "asc"],
+      [2, "asc"],
     ],
     columnDefs: [
       {
@@ -143,11 +155,14 @@ $(document).ready(function () {
     ],
     stripeClasses: [],
     paging: true,
+    pageLength: 50,
     serverSide: true,
     processing: true,
-    pageLength: 50,
     ordering: false,
     searching: true,
+    search: {
+      return: true,
+    },
     select: true,
     responsive: true,
     altEditor: true, // Enable altEditor
@@ -179,6 +194,7 @@ $(document).ready(function () {
           if (!!collapsedGroups[parent]) {
             return;
           }
+          td_row = renderInvoiceLevelTd(group, rows);
           all = top + parent + group;
         }
 

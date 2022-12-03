@@ -1,6 +1,7 @@
 from django.db import models
 from django.forms.models import model_to_dict
 from decimal import Decimal
+from django.utils.translation import gettext as _
 # Create your models here.
 
 
@@ -12,6 +13,22 @@ class ModelWithMetaData(models.Model):
         abstract = True
 
 
+class Client(ModelWithMetaData):
+    client_ident = models.CharField(db_column='ClientIdent', max_length=39)
+    client_name = models.CharField(db_column='ClientSortName', max_length=255)
+    client_full_id = models.CharField(_("Client ID"), max_length=50)
+
+    def __str__(self) -> str:
+        return f"{self.client_name} ({self.client_full_id})"
+
+    def __iter__(self):
+        return iter(self.prog_invs.all())
+
+    class Meta:
+        db_table = 'tblClient'
+        ordering = ('client_name', )
+
+
 class ProgressInvoice(ModelWithMetaData):
     invoice_ident = models.CharField(db_column='InvoiceIdent', max_length=39)
     invoice_number = models.CharField(db_column='InvoiceNumber', max_length=25)
@@ -19,9 +36,8 @@ class ProgressInvoice(ModelWithMetaData):
         db_column='UnbilledWIP', max_digits=9, decimal_places=2, null=True)
     unappliedprog_amt = models.DecimalField(
         db_column='OpenAmount', max_digits=9, decimal_places=2)
-    client_ident = models.CharField(db_column='ClientIdent', max_length=39)
-    client_name = models.CharField(db_column='ClientName', max_length=255)
-    client_full_id = models.CharField(db_column='ClientIdSubId', max_length=50)
+    client = models.ForeignKey(
+        Client, on_delete=models.CASCADE, related_name='prog_invs')
     is_deactive = models.BooleanField(
         db_column='IsDeactivated', default=False)
     audit_partner = models.CharField(
@@ -32,7 +48,7 @@ class ProgressInvoice(ModelWithMetaData):
 
     @property
     def display_client_name(self):
-        return f"{self.client_name} ({self.client_full_id})"
+        return f"{self.client.client_name} ({self.client.client_full_id})"
 
     @property
     def display_invoice_name(self):
@@ -65,11 +81,11 @@ class ProgressInvoice(ModelWithMetaData):
         self.unappliedprog_amt = value
         # self.save()
 
+    def __str__(self) -> str:
+        return f"InvoiceNumber: {self.invoice_number}, ClientName: {self.client.client_name}, OpenAmount: {self.unappliedprog_amt}, RemainingAmount: {self.remaining_amount}"
+
     def __iter__(self):
         return iter(self.allocs.all())
-
-    def __str__(self) -> str:
-        return f"InvoiceNumber: {self.invoice_number}, ClientName: {self.client_name}, OpenAmount: {self.unappliedprog_amt}, RemainingAmount: {self.remaining_amount}"
 
     def auto_allocated(self):
         allocs = self.allocs.all()
