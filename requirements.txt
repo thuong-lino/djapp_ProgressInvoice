@@ -1,4 +1,0 @@
-django
-django-extensions
-mssql-django
-wfastcgi
