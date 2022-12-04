@@ -22,8 +22,8 @@ def refresh_db_view(request):
 
 
 def get_allocations(request):
-    _per_page = request.GET.get('length', 25)
-    _start_index = request.GET.get('start')
+    _per_page = request.GET.get('length', "-1")
+    _start_index = request.GET.get('start', 0)
     _search_value = request.GET.get('search[value]', None)
     _aut_partner_search_value = request.GET.get('columns[4][search][value]')
 
@@ -36,8 +36,7 @@ def get_allocations(request):
 
     #clients = Client.objects.raw(query)
     if _search_value:
-        searchable_fields = ['client_name',
-                             'client_full_id', 'prog_invs__audit_partner']
+        searchable_fields = ['client_name', 'client_full_id']
         queries = [Q(**{f'{f}__icontains': _search_value})
                    for f in searchable_fields]
         r = reduce(lambda a, b: a | b, queries)
@@ -48,12 +47,12 @@ def get_allocations(request):
 
         queries = [Q(**{'prog_invs__audit_partner__icontains': name})
                    for name in list_name]
-        r = reduce(lambda a, b: a | b, queries)
+        r = reduce(lambda a, b: a & b, queries)
         clients = clients.filter(r)
 
     progress_invoices = []
-    for c in clients:
-        progress_invoices += c
+    for prog_invcs in clients:
+        progress_invoices += prog_invcs
     data = []
 
     for invoice in progress_invoices:
