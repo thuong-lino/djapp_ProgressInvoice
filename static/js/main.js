@@ -81,8 +81,8 @@ $(document).ready(function () {
     language: {
       decimal: ",",
       thousands: ".",
-      search: "Search by Client ID, Name and Audit Partner",
-      searchPlaceholder: "Search",
+      search: "",
+      searchPlaceholder: "Search by Client ID, Name",
     },
     ajax: {
       url: "api/data/",
@@ -122,6 +122,8 @@ $(document).ready(function () {
         type: "number",
 
         createdCell: function (td, cellData, rowData, row, col) {
+          $(td).css("text-decoration", "underline");
+          $(td).css("text-decoration-style", "double");
           if (cellData < 1) {
             $(td).css("color", "red");
           }
@@ -154,7 +156,7 @@ $(document).ready(function () {
       { width: "50%", targets: 3 },
     ],
     stripeClasses: [],
-    paging: true,
+    paging: false,
     pageLength: 50,
     serverSide: true,
     processing: true,
@@ -270,7 +272,23 @@ $(document).ready(function () {
       });
     },
   });
+  // Setup - add a text input to each headers cell
+  $("#table_allocation_filter").each(function () {
+    var title = $(this).text();
+    element = `<label><input type="search" id='audit_partner_search' class="form-control form-control-sm" placeholder="Search Audit Partner" aria-controls="table_allocation"></label>`;
+    $(this).prepend(element);
+  });
+  $("#audit_partner_search").on("keyup change", function (event) {
+    var keycode = event.keyCode ? event.keyCode : event.which;
 
+    if (keycode == "13") {
+      table.columns(4).search(this.value).draw();
+    }
+
+    // if (table.search() !== this.value) {
+    //      table.search(this.value).draw();
+    // }
+  });
   $("#table_allocation").on("dblclick", "tbody tr", function () {
     table.rows(this).select();
     table.button("0").trigger();

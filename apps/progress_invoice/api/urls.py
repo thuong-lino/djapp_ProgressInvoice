@@ -5,4 +5,5 @@ urlpatterns = [
     path('data/', get_allocations),
     path('data/<int:alloc_id>/', put_allocation, name='put_allocation'),
     path('refresh_db/', refresh_db_view, name='refresh_all'),
+
 ]
