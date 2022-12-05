@@ -13,8 +13,14 @@ function getCookie(name) {
   }
   return cookieValue;
 }
+function numberWithCommas(x) {
+  return x;
+}
 function fd(num) {
-  return (Math.round(num * 100) / 100).toFixed(2);
+  return (Math.round(num * 100) / 100)
+    .toFixed(2)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 function renderClientLevelTd(group, rows) {
   var open_amount_sum = 0;
@@ -79,8 +85,7 @@ $(document).ready(function () {
 
   var table = $("#table_allocation").DataTable({
     language: {
-      decimal: ",",
-      thousands: ".",
+      thousands: ",",
       search: "",
       searchPlaceholder: "Search by Client ID, Name",
     },
@@ -120,11 +125,13 @@ $(document).ready(function () {
         data: "allocated_amount",
         title: "Allocated Amount",
         type: "number",
+        step: 0.01,
+        render: $.fn.dataTable.render.number(",", ".", 2),
 
         createdCell: function (td, cellData, rowData, row, col) {
           $(td).css("text-decoration", "underline");
           $(td).css("text-decoration-style", "double");
-          if (cellData < 1) {
+          if (cellData == 0) {
             $(td).css("color", "red");
           }
         },
@@ -143,24 +150,19 @@ $(document).ready(function () {
       }
     },
 
-    order: [
-      [0, "asc"],
-      [1, "asc"],
-      [2, "asc"],
-    ],
     columnDefs: [
       {
         targets: [0, 1, 2],
         visible: false,
       },
       { width: "50%", targets: 3 },
+      { targets: 7, type: "num-fmt" },
     ],
     stripeClasses: [],
     paging: false,
     pageLength: 50,
     serverSide: true,
     processing: true,
-    ordering: false,
     searching: true,
     search: {
       return: true,
@@ -244,7 +246,7 @@ $(document).ready(function () {
             },
             error: function (e) {
               console.log("reload failed");
-              console.log(e);
+
               Swal.fire({
                 title: "Error!",
                 text: "Error",
@@ -256,7 +258,6 @@ $(document).ready(function () {
       },
     ],
     onEditRow: function (datatable, rowdata, success, error) {
-      console.log(rowdata);
       $.ajax({
         // a tipycal url would be /{id} with type='POST'
         url: "api/data/" + rowdata.id + "/",
@@ -304,5 +305,27 @@ $(document).ready(function () {
   });
   $(".modal").on("hidden.bs.modal", function (e) {
     selected_row = table.rows(".selected").deselect();
+  });
+  $("#table_allocation").on("draw.dt", function () {
+    var open_amount_sum = 0;
+    rows = table.rows();
+    rows
+      .data()
+      .toArray()
+      .forEach((element) => {
+        if (element["project_ident"] === null) {
+          open_amount_sum += parseFloat(element["unappliedprog_amt"]);
+        }
+      });
+
+    var allocated_amount_sum = rows
+      .data()
+      .pluck("allocated_amount")
+      .reduce((a, b) => {
+        return a + b * 1.0;
+      }, 0);
+
+    var unallocated_amount_sum = open_amount_sum - allocated_amount_sum;
+    $("#total_unallocated").text(fd(unallocated_amount_sum));
   });
 });
