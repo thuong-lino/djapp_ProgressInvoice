@@ -27,7 +27,8 @@ SECRET_KEY = 'django-insecure-=a(+k$6aihyd%i=acrym*2n(5e4t(yaesm1qj190ift==efr=4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
 parser = configparser.ConfigParser()
 parser.read([BASE_DIR / 'core/config.cfg'])
 config = parser['db']
