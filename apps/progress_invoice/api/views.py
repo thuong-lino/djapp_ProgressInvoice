@@ -49,6 +49,8 @@ def get_allocations(request):
                    for name in list_name]
         r = reduce(lambda a, b: a & b, queries)
         clients = clients.filter(r)
+    clients = clients.distinct()
+    print(clients.query)
 
     progress_invoices = []
     for prog_invcs in clients:
