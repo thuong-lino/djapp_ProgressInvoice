@@ -103,7 +103,7 @@ $(document).ready(function () {
         type: "readonly",
       },
       {
-        data: "project_name",
+        data: "display_project_name",
         title: "Project Name",
         class: "order_id",
         type: "readonly",
@@ -135,7 +135,7 @@ $(document).ready(function () {
             $(td).css("color", "red");
           }
           if (rowData["is_auto_applied_amount"] === true) {
-            $(td).append(" (auto)");
+            $(td).append(" (auto allocated)");
           }
         },
       },

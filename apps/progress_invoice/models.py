@@ -124,12 +124,19 @@ class ProgessInvoiceAllocation(ModelWithMetaData):
             self.is_alloc_active = True
         return super().save(*args, **kwargs)
 
+    @property
+    def display_project_name(self):
+        if self.project_status is None or self.project_status == '':
+            return self.project_name
+        return f'{self.project_name} (Status: "{self.project_status}")'
+
     def to_table(self):
         parent = self.progress_invoice
         data = model_to_dict(self, exclude=['progress_invoice'])
         data.update(model_to_dict(parent, exclude=['id']))
         data['display_client_name'] = parent.display_client_name
         data['display_invoice_name'] = parent.display_invoice_name
+        data['display_project_name'] = self.display_project_name
         data['audit_partner'] = parent.audit_partner
         data['remaining_amount'] = parent.remaining_amount if self.allocated_amount == 0 else ''
         return data
