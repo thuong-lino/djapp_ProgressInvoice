@@ -46,7 +46,7 @@ def get_project_items(client_ident):
     select InterimWorkingProjectIdent as project_ident
     , ProjectName as project_name
     , ProjectStatus as project_status
-    from INTERIMWORKINGPROJECT where ClientIdent = '{client_ident}' and ProjectStatus <> 'Complete' and ProjectName <> 'Internal Project'
+    from INTERIMWORKINGPROJECT where ClientIdent = '{client_ident}'  and ProjectName <> 'Internal Project'
     """
     data = []
     with connection.cursor() as cursor:

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.forms.models import model_to_dict
 from decimal import Decimal
 from django.utils.translation import gettext as _
@@ -88,15 +89,17 @@ class ProgressInvoice(ModelWithMetaData):
         return iter(self.allocs.all())
 
     def auto_allocated(self):
-        allocs = self.allocs.all()
-        if len(allocs) == 2:
-            alloc = allocs.exclude(project_ident=None).first()
+        allocs = self.allocs.filter(
+            ~Q(project_status='Complete') & ~Q(project_ident=None))
+        if allocs.count() == 1:
+            alloc = allocs.first()
             alloc.allocated_amount = self.unappliedprog_amt
+            alloc.is_auto_applied_amount = True
             alloc.save()
 
     def save(self, *args, **kwargs):
-
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
+        # self.auto_allocated()
 
 
 class ProgessInvoiceAllocation(ModelWithMetaData):
@@ -111,7 +114,7 @@ class ProgessInvoiceAllocation(ModelWithMetaData):
         db_column='AppliedAmount', max_digits=9, decimal_places=2, default=0)
     is_alloc_active = models.BooleanField(db_column='IsActive', default=True)
     is_auto_applied_amount = models.BooleanField(
-        db_column='IsAutoApplied', default=True)
+        db_column='IsAutoApplied', default=False)
 
     class Meta:
         db_table = 'tblProgressInvoiceAllocation'

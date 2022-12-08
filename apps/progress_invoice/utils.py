@@ -21,11 +21,15 @@ def compare_progress_invoice(cch_invoice: dict,  *args, **kwargs):
     if created:
         [ProgessInvoiceAllocation.objects.create(
             progress_invoice=_ref, **item) for item in new_allocs]
-        _ref.auto_allocated()
+
     else:
         _ref.is_deactive = False
+        # refresh project
+        [ProgessInvoiceAllocation.objects.update_or_create(
+            progress_invoice=_ref, project_ident=item['project_ident'], project_name=item['project_name'], defaults=item) for item in new_allocs]
         if _ref.unappliedprog_amt != cch_open_amount:
             _ref.on_change_open_amount(cch_open_amount)
+    _ref.auto_allocated()
 
 
 def refresh_all():

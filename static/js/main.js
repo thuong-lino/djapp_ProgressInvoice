@@ -134,6 +134,9 @@ $(document).ready(function () {
           if (cellData == 0) {
             $(td).css("color", "red");
           }
+          if (rowData["is_auto_applied_amount"] === true) {
+            $(td).append(" (auto)");
+          }
         },
       },
       {
@@ -147,6 +150,9 @@ $(document).ready(function () {
     createdRow: function (row, data, dataIndex) {
       if (data["is_alloc_active"] == false) {
         $(row).addClass("row-disabled");
+      }
+      if (data["project_status"] == "Complete") {
+        $(row).addClass("row-completed-project");
       }
     },
 
@@ -256,6 +262,22 @@ $(document).ready(function () {
           });
         },
       },
+      "spacer",
+      {
+        text: "Hide 'Completed' Projects",
+        action: function (e, dt, node, config) {
+          if (node.text() == "Display 'Completed' Projects") {
+            node.text("Hide 'Completed' Projects");
+            dt.rows(".row-completed-project").nodes().to$().css("display", "");
+          } else {
+            node.text("Display 'Completed' Projects");
+            dt.rows(".row-completed-project")
+              .nodes()
+              .to$()
+              .css("display", "none");
+          }
+        },
+      },
     ],
     onEditRow: function (datatable, rowdata, success, error) {
       $.ajax({
@@ -306,6 +328,7 @@ $(document).ready(function () {
   $(".modal").on("hidden.bs.modal", function (e) {
     selected_row = table.rows(".selected").deselect();
   });
+
   $("#table_allocation").on("draw.dt", function () {
     var open_amount_sum = 0;
     rows = table.rows();

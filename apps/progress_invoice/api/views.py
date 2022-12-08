@@ -53,9 +53,9 @@ def get_allocations(request):
     # print(clients.query)
 
     progress_invoices = []
-    for prog_invcs in clients:
-        progress_invoices += prog_invcs
     data = []
+    for prog_invs in clients:
+        progress_invoices += prog_invs
 
     for invoice in progress_invoices:
         data += [alloc.to_table() for alloc in invoice]
