@@ -22,17 +22,20 @@ SELECT
        ClientIdSubId as client_full_id,
 	   C.ClientSortName as client_name,
        BilledAmount as unappliedprog_amt,
-  (SELECT top 1 STAFFName
-   FROM clientcrs crs
-   JOIN staff s ON crs.StaffIdent=s.StaffIdent
-   WHERE crs.ClientIdent=c.clientident
-     AND crs.firmclientstaffassignmentname='Audit partner') [audit_partner]
+	S.StaffName
 FROM WIP W
 JOIN Client C ON w.ClientIdent=C.ClientIdent
 JOIN INVOICE I ON W.ProgressInvIntIdent=I.InvoiceIdent
+LEFT JOIN (
+	SELECT  STAFFName, ClientIdent, firmclientstaffassignmentname
+   FROM clientcrs crs
+   JOIN staff s ON crs.StaffIdent=s.StaffIdent
+   AND crs.firmclientstaffassignmentname IN ('Audit partner', 'ITSC Partner')
+) S ON C.ClientIdent= S.clientident
 WHERE WIPTypeCode=3 -- code 3 is progress invoice
 AND W.InvoiceIdent IS NULL --
 AND BillingStatusCode<>1
+and S.firmclientstaffassignmentname is not null
             """
         cursor.execute(query)
         data = dictfetchall(cursor)
