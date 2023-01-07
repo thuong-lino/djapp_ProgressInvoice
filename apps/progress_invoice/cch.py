@@ -21,7 +21,8 @@ SELECT
 	   C.clientident as client_ident,
        ClientIdSubId as client_full_id,
 	   C.ClientSortName as client_name,
-       BilledAmount as unappliedprog_amt
+       BilledAmount as unappliedprog_amt,
+       S.StaffName as [audit_partner]
 FROM WIP W
 JOIN Client C ON w.ClientIdent=C.ClientIdent
 JOIN INVOICE I ON W.ProgressInvIntIdent=I.InvoiceIdent
