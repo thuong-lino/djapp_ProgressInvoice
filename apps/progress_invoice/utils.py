@@ -30,7 +30,7 @@ def compare_progress_invoice(cch_invoice: dict,  *args, **kwargs):
         current_app_projects = ProgessInvoiceAllocation.objects.filter(
             progress_invoice=_ref)
         current_cch_projects = [item['project_ident'] for item in new_allocs]
-        project_dsp = current_app_projects.exclude(
+        project_dsp = current_app_projects.objects.exclude(
             project_ident__in=current_cch_projects)
         # Detect missing projects and delete them
         project_dsp.delete()
