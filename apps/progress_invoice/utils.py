@@ -14,11 +14,12 @@ def compare_progress_invoice(cch_invoice: dict,  *args, **kwargs):
     _ref, created = ProgressInvoice.objects.get_or_create(
         invoice_ident=cch_invoice_ident, defaults=cch_invoice)
     new_allocs = get_project_items(client_ident)
-    new_allocs += [{
-        'project_ident': None,
-        'project_name': 'Unassigned',
-    }]
+
     if created:
+        new_allocs += [{
+            'project_ident': None,
+            'project_name': 'Unassigned',
+        }]
         [ProgessInvoiceAllocation.objects.create(
             progress_invoice=_ref, **item) for item in new_allocs]
 
