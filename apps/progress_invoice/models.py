@@ -92,7 +92,7 @@ class ProgressInvoice(ModelWithMetaData):
         allocs = self.allocs.filter(~Q(project_ident=None))
         if allocs.count() == 1:
             alloc = allocs.first()
-            if self.remaining_amount >= self.unappliedprog_amt:
+            if self.progress_invoice.remaining_amount >= self.unappliedprog_amt:
                 alloc.allocated_amount = self.unappliedprog_amt
                 alloc.is_auto_applied_amount = True
                 alloc.save()
