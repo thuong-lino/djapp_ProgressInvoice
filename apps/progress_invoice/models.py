@@ -163,8 +163,11 @@ class ProgessInvoiceAllocation(ModelWithMetaData):
                 self.is_auto_applied_amount = False
                 self.save()
             else:
-                raise ValidationError(
-                    f'Could not allocate amount {value}. Please try amount less than {self.progress_invoice.remaining_amount + self.allocated_amount}', 'allocate_error')
+                if self.progress_invoice.remaining_amount + self.allocated_amount == Decimal('0.00'):
+                    msg = f'Could not allocate amount {value}. No more available Unapplied Progress Amount'
+                else:
+                    msg = f'Could not allocate amount {value}. Please try amount less than {self.progress_invoice.remaining_amount + self.allocated_amount}'
+                raise ValidationError(msg, 'allocate_error')
 
     def __str__(self) -> str:
         return f"<{self.project_name}: {self.allocated_amount}>"
