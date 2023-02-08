@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum, Case, When, F, OuterRef, Subquery
 from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import ValidationError
 import re
 
 from functools import reduce
@@ -83,7 +84,10 @@ def put_allocation(request, alloc_id):
     if request.method == 'PUT':
         alloc = get_object_or_404(ProgessInvoiceAllocation, pk=alloc_id)
         query_dict = QueryDict(request.body)
-        alloc.allocate_amount(query_dict.get('allocated_amount'))
+        try:
+            alloc.allocate_amount(query_dict.get('allocated_amount'))
+        except ValidationError as err:
+            return JsonResponse({'error': err.message}, status=400)
 
         return JsonResponse(alloc.to_table())
     return HttpResponseBadRequest

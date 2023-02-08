@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Q
 from django.forms.models import model_to_dict
+from django.core.exceptions import ValidationError
 from decimal import Decimal
 from django.utils.translation import gettext as _
 # Create your models here.
@@ -89,7 +90,8 @@ class ProgressInvoice(ModelWithMetaData):
         return iter(self.allocs.all())
 
     def auto_allocated(self):
-        allocs = self.allocs.filter(~Q(project_ident=None))
+        allocs = self.allocs.filter(
+            Q(project_status='Complete') & ~Q(project_ident=None))
         if allocs.count() == 1:
             alloc = allocs.first()
             if self.remaining_amount >= self.unappliedprog_amt:
@@ -147,6 +149,7 @@ class ProgessInvoiceAllocation(ModelWithMetaData):
         self.save()
 
     def allocate_amount(self, value):
+        """raise ValidationError"""
         if type(value) is not Decimal:
             try:
                 value = Decimal(value)
@@ -159,6 +162,9 @@ class ProgessInvoiceAllocation(ModelWithMetaData):
                 self.allocated_amount = value
                 self.is_auto_applied_amount = False
                 self.save()
+            else:
+                raise ValidationError(
+                    f'Could not allocate amount {value}. Please try amount less than {self.progress_invoice.remaining_amount + self.allocated_amount}', 'allocate_error')
 
     def __str__(self) -> str:
         return f"<{self.project_name}: {self.allocated_amount}>"

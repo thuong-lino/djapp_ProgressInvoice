@@ -290,7 +290,12 @@ $(document).ready(function () {
         data: rowdata,
         success: success,
         error: (error) => {
-          console.log(error);
+          console.log(error.responseJSON.error);
+          Swal.fire({
+            title: "Allocation Error!",
+            text: error.responseJSON.error,
+            icon: "error",
+          });
         },
       });
     },
