@@ -89,13 +89,13 @@ class ProgressInvoice(ModelWithMetaData):
         return iter(self.allocs.all())
 
     def auto_allocated(self):
-        allocs = self.allocs.filter(
-            ~Q(project_status='Complete') & ~Q(project_ident=None))
+        allocs = self.allocs.filter(~Q(project_ident=None))
         if allocs.count() == 1:
             alloc = allocs.first()
-            alloc.allocated_amount = self.unappliedprog_amt
-            alloc.is_auto_applied_amount = True
-            alloc.save()
+            if self.remaining_amount >= self.unappliedprog_amt:
+                alloc.allocated_amount = self.unappliedprog_amt
+                alloc.is_auto_applied_amount = True
+                alloc.save()
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -162,3 +162,6 @@ class ProgessInvoiceAllocation(ModelWithMetaData):
 
     def __str__(self) -> str:
         return f"<{self.project_name}: {self.allocated_amount}>"
+
+    def __repr__(self) -> str:
+        return f"<{self.project_name}({self.project_ident}): {self.allocated_amount}>"
