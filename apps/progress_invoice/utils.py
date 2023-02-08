@@ -27,6 +27,13 @@ def compare_progress_invoice(cch_invoice: dict,  *args, **kwargs):
         # refresh project
         [ProgessInvoiceAllocation.objects.update_or_create(
             progress_invoice=_ref, project_ident=item['project_ident'], project_name=item['project_name'], defaults=item) for item in new_allocs]
+        current_app_projects = ProgessInvoiceAllocation.objects.filter(
+            progress_invoice=_ref)
+        current_cch_projects = [item['project_ident'] for item in new_allocs]
+        project_dsp = current_app_projects.objects.exclude(
+            project_ident__in=current_cch_projects)
+        # Detect missing projects and delete them
+        project_dsp.delete()
         if _ref.unappliedprog_amt != cch_open_amount:
             _ref.on_change_open_amount(cch_open_amount)
     _ref.auto_allocated()
