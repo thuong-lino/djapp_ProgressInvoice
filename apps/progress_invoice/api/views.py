@@ -31,9 +31,9 @@ def get_allocations(request):
 
     allocated = ProgessInvoiceAllocation.objects.filter(progress_invoice__client__id=OuterRef('id')).values(
         'progress_invoice__client__id').annotate(sum_unapplied_amt=Sum('allocated_amount')).values('sum_unapplied_amt')
-    unapplied = ProgressInvoice.objects.filter(is_deactive=False).filter(client__id=OuterRef('id')).values(
+    unapplied = ProgressInvoice.objects.filter(client__id=OuterRef('id')).values(
         'client__id').annotate(sum_umallocated_amt=Sum('unappliedprog_amt')).values('sum_umallocated_amt')
-    clients = Client.objects.annotate(unapplied_amt=Subquery(unapplied), allocated_amt=Subquery(
+    clients = Client.objects.filter(prog_invs__is_deactive=False).annotate(unapplied_amt=Subquery(unapplied), allocated_amt=Subquery(
         allocated)).annotate(unallocated=F('unapplied_amt') - F('allocated_amt')).order_by('-unallocated')
 
     #clients = Client.objects.raw(query)

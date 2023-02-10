@@ -107,6 +107,9 @@ class ProgressInvoice(ModelWithMetaData):
                     alloc.save()
 
     def save(self, *args, **kwargs):
+        if self.allocs.exclude(project_ident=None).count() == 0:
+            print('Deactive Invoice:', self.invoice_number)
+            self.is_deactive = True
         super().save(*args, **kwargs)
         # self.auto_allocated()
 

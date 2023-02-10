@@ -36,15 +36,19 @@ def compare_progress_invoice(cch_invoice: dict,  *args, **kwargs):
             project_ident__in=current_cch_projects)
         # Detect missing projects and delete them
         project_dsp.delete()
+        # if project is non-existent , set to deactive
+
         if _ref.unappliedprog_amt != cch_open_amount:
             _ref.on_change_open_amount(cch_open_amount)
     _ref.auto_allocated()
+    _ref.save()
 
 
 def refresh_all():
     unapplied_invoice = get_unapplied_process_invoices()
 
     existing_idents = list(item['invoice_ident'] for item in unapplied_invoice)
+
     for invoice in unapplied_invoice:
         compare_progress_invoice(invoice)
     disappeareds = ProgressInvoice.objects.exclude(
