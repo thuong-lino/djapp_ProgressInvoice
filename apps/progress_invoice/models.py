@@ -78,7 +78,7 @@ class ProgressInvoice(ModelWithMetaData):
 
     def on_change_open_amount(self, value):
         for alloc in self:
-            alloc.set_alloc_status(False)
+            alloc.allocate_amount(0)
         print('On Change Amount Evennt')
         self.unappliedprog_amt = value
         # self.save()
